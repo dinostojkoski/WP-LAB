@@ -16,7 +16,7 @@ public class SongRepository {
 
     public Song findByTrackId(String trackId) {
         return DataHolder.songList.stream()
-                .filter(s -> s.getTrackId().equals(trackId))
+                .filter(song -> song.getTrackId().equals(trackId))
                 .findFirst().orElse(null);
     }
 
@@ -29,5 +29,4 @@ public class SongRepository {
         }
         return null;
     }
-
 }

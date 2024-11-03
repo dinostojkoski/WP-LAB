@@ -17,6 +17,7 @@ import java.util.List;
 
 @WebServlet(name = "SongListServlet", urlPatterns = {"/songs/song-list"})
 public class SongListServlet extends HttpServlet {
+
     private final SongService songService;
     private final SpringTemplateEngine springTemplateEngine;
 
@@ -31,14 +32,11 @@ public class SongListServlet extends HttpServlet {
         songList = songService.listSongs();
 
         IWebExchange webExchange = JakartaServletWebApplication
-                .buildApplication(getServletContext())
+                .buildApplication(req.getServletContext())
                 .buildExchange(req, resp);
 
         WebContext context = new WebContext(webExchange);
-
         context.setVariable("songList", songList);
-
         springTemplateEngine.process("listSongs.html", context, resp.getWriter());
     }
-
 }

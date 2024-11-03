@@ -8,7 +8,6 @@
   <header>
     <h1 th:text="${entity.getTitle()}">Song title</h1>
   </header>
-
   <section>
     <h2 th:text="${entity.getGenre()}">Genre</h2>
     <h2 th:text="${entity.getReleaseYear()}">Year</h2>
@@ -17,6 +16,5 @@
       <li th:each="artist : ${entity.getPerformers()}" th:text="${artist.getFirstName()} + ' ' + ${artist.getLastName()}" >Jon Bon Jovi</li>
     </ul>
   </section>
-
 </body>
 </html>

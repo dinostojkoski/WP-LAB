@@ -18,6 +18,7 @@ import java.io.IOException;
 
 @WebServlet(name = "SongDetailsServlet", urlPatterns = {"/songs/song-details"})
 public class SongDetailsServlet extends HttpServlet {
+
     private final SpringTemplateEngine springTemplateEngine;
     private final SongServiceImpl songService;
     private final ArtistServiceImpl artistService;
@@ -30,16 +31,14 @@ public class SongDetailsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Song s = songService.listSongs().stream().findFirst().orElse(null);
+        Song song = songService.listSongs().stream().findFirst().orElse(null);
 
-        IWebExchange iWebExchange = JakartaServletWebApplication
+        IWebExchange WebExchange = JakartaServletWebApplication
                 .buildApplication(req.getServletContext())
                 .buildExchange(req, resp);
 
-        WebContext context = new WebContext(iWebExchange);
-
-        context.setVariable("entity", s);
-
+        WebContext context = new WebContext(WebExchange);
+        context.setVariable("entity", song);
         springTemplateEngine.process("songDetails.html", context, resp.getWriter());
     }
 
@@ -47,22 +46,44 @@ public class SongDetailsServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String trackId = req.getParameter("trackId");
         String artistId = req.getParameter("artistId");
-        Song s = songService.listSongs().stream().findFirst().orElse(null);
+        //Song song = songService.listSongs().stream().findFirst().orElse(null);
+        Song song = null;
 
-        if (trackId != null && artistId != null) {
-            s = songService.findByTrackId(trackId);
-            Artist a = artistService.findById(Long.valueOf(artistId));
-            s.addPerformer(a);
+        /*if (trackId != null && artistId != null) {
+            song = songService.findByTrackId(trackId);
+            Artist artist = artistService.findById(Long.valueOf(artistId));
+            song.addPerformer(artist);
+        }*/
+
+        if (trackId != null) {
+            song = songService.findByTrackId(trackId);
         }
 
-        IWebExchange iWebExchange = JakartaServletWebApplication
+        if (song == null) {
+            // Handle the case where the song was not found
+            System.err.println("Song not found for trackId: " + trackId);
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Song not found");
+            return; // Exit early
+        }
+
+        if (artistId != null) {
+            Artist artist = artistService.findById(Long.valueOf(artistId));
+            if (artist != null) {
+                song.addPerformer(artist); // Only call this if artist is found
+            } else {
+                // Handle the case where the artist was not found
+                System.err.println("Artist not found for artistId: " + artistId);
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Artist not found");
+                return; // Exit early
+            }
+        }
+
+        IWebExchange WebExchange = JakartaServletWebApplication
                 .buildApplication(req.getServletContext())
                 .buildExchange(req, resp);
 
-        WebContext context = new WebContext(iWebExchange);
-
-        context.setVariable("entity", s);
-
+        WebContext context = new WebContext(WebExchange);
+        context.setVariable("entity", song);
         springTemplateEngine.process("songDetails.html", context, resp.getWriter());
     }
 }

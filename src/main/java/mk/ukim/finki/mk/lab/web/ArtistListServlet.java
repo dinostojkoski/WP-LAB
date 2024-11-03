@@ -32,13 +32,11 @@ public class ArtistListServlet extends HttpServlet {
         artistList = artistService.listArtists();
 
         IWebExchange webExchange = JakartaServletWebApplication
-                .buildApplication(getServletContext())
+                .buildApplication(req.getServletContext())
                 .buildExchange(req, resp);
 
         WebContext context = new WebContext(webExchange);
-
         context.setVariable("artistList", artistList);
-
         springTemplateEngine.process("listArtists.html", context, resp.getWriter());
     }
 
@@ -55,11 +53,10 @@ public class ArtistListServlet extends HttpServlet {
         }
 
         IWebExchange webExchange = JakartaServletWebApplication
-                .buildApplication(getServletContext())
+                .buildApplication(req.getServletContext())
                 .buildExchange(req, resp);
 
         WebContext context = new WebContext(webExchange);
-
         context.setVariable("trackId", trackId);
         context.setVariable("artistList", artistList);
         springTemplateEngine.process("listArtists.html", context, resp.getWriter());
